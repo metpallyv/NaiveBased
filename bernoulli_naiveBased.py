@@ -1,6 +1,5 @@
 __author__ = 'Vardhaman'
 #Implementation of multivariate bernoulli naive based classifier
-
 import sys
 import csv
 import math
@@ -18,6 +17,7 @@ test_doc_class = {}#dic with test doc id and its corresponding class value
 doc_dict = {}#construct test doc with docid as key and word n count as another dict
 class_dict = {} # no of docs belonging to a class
 
+#method to get a dictionary for each word and its frequency over the entire corpus
 def vocab_fre(train_file):
     f = open(train_file,'r')
     for line in f.readlines():
@@ -28,8 +28,8 @@ def vocab_fre(train_file):
             word_dict[words[1]] = int(words[2])
     print "dictionary",word_dict
 
+#method to cal prior probability for each class
 def cal_prior_prob_for_class(label_file):
-
     f = open(label_file, 'r')
     count = 1
     for line in f.readlines():
@@ -47,6 +47,7 @@ def cal_prior_prob_for_class(label_file):
     #print prior_prob_dict
     #print doc_class
 
+#word and associated count for that word for each class
 def add_word_to_dict(class_dict,word,count):
     if class_dict.has_key(word):
         class_dict[word] = int(class_dict.get(word)) + int(count)
