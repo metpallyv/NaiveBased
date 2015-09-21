@@ -1,4 +1,4 @@
-#  Multivariate Bernoulli and Multinomial event NaiveBased Document Classification
+#  Multivariate Bernoulli and Multinomial Event NaiveBased Document Classification
 
 Goal of this project is to implement NaiveBased Classifier without using any Machine Learning libraries
 
