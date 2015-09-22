@@ -54,11 +54,13 @@ def add_word_to_dict(class_dict,word,count):
     else:
         class_dict[word] = int(count)
 
+# this logic is horrible right now, need to improve it soon
+# dicitonary with each class id and corresponding count for no of docs in which the word occurs
+#this is done because we are doing bernoulli
 def add_word_to_appropriate_class_dict(words):
     doc_class_val= int(doc_class[int(words[0])])
     #print(doc_class_val)
     if doc_class_val == 1:
-
         if class_1.has_key(words[1]):
             class_1[words[1]] = int(class_1.get(words[1])) + 1
         else:
@@ -159,6 +161,7 @@ def add_word_to_appropriate_class_dict(words):
         else:
             class_20[words[1]] = 1
 
+#dic with test doc id and its corresponding class value
 def build_test_class_dict(testlabel):
     f = open(test_label,'r')
     count = 1
@@ -168,6 +171,8 @@ def build_test_class_dict(testlabel):
         count +=1
     #print len(test_doc_class)
 
+#this is the method which calls this stupid implementation 
+#which gets the number of docs in which the word occurs for every class 
 def build_bernoulli_distr(label_file,vocab):
     f = open(label_file,'r')
     for line in f.readlines():
@@ -175,6 +180,7 @@ def build_bernoulli_distr(label_file,vocab):
         if words[1] in vocab:
             add_word_to_appropriate_class_dict(words)
 
+#construct test doc with docid as key and word n count as another dict
 def build_doc_for_words(testfile):
     f = open(testfile,'r')
     for line in f.readlines():
@@ -190,25 +196,22 @@ def build_doc_for_words(testfile):
             else:
                 dict_of_words_count[words[1]] = int(words[2])
                 doc_dict[words[0]] = dict_of_words_count
-
-            '''l = doc_dict[words[0]]
-            l.append(dic)
-            doc_dict[words[0]] = l'''
         else:
             dict_of_words_count = {}
             dict_of_words_count[words[1]] = words[2]
             doc_dict[words[0]] = dict_of_words_count
     #print doc_dict
 
+#method to get the count of every word in a doc
 def return_count_term_in_doc(term,ele_in_doc):
     for i in ele_in_doc:
         if i.has_key(term):
             return int(i[term])
     return 0
 
+#predict the class for the test doc
 def predict_class(vocab_words,v):
     pred_dict = {}
-
     for doc_id,ele_in_doc in doc_dict.items():
         max_score = -99999999999
         final_class = 0
@@ -231,6 +234,7 @@ def predict_class(vocab_words,v):
         pred_dict[int(doc_id)] = int(final_class)
     return pred_dict
 
+#acuuracy for the test data
 def find_accuracy(d,val):
     no_of_right = 0
     no_of_wrong = 0
@@ -240,13 +244,13 @@ def find_accuracy(d,val):
         #print "Value of pred is", d[k+1], "Value of test label is", test_doc_class[k+1]
         if int(d[k+1]) == int(test_doc_class[k+1]):
             no_of_right +=1
-
         else:
             no_of_wrong +=1
     #print "Sum of right and wrong is", no_of_wrong+no_of_right
     print "No of right values", no_of_right
     print "Accuracy for ",val, " ", "is", 100 * no_of_right/float(no_of_docs)
 
+#cal conditional probability for each term in the vocabulary
 def cal_conditional_term_in_vocab(vocab):
     for it,val in enumerate(class_list):
         no_of_docs = class_dict[str(it+1)]
@@ -273,19 +277,16 @@ if __name__ == "__main__":
         build_doc_for_words(test_file)
         Freq = sorted(word_dict.iteritems(),key=itemgetter(1),reverse=True)
         l = [100, 500, 1000, 2500, 5000, 7500, 10000, 12500, 25000, 50000]
-        #Freq = sorted(word_dict, key=word_dict.get, reverse=True)
-
-        #print "Sorted dic",Freq
-        #print Freq1
         for v in l:
             p_list  = []
             vocab_words = []
             for i in range(v):
                 tmp = Freq[i]
                 vocab_words.append(tmp[0])
-            print(len(vocab_words))
+            #print(len(vocab_words))
             vocab_words = set(vocab_words)
-            print "new vacab len",len(vocab_words)
+            #print "new vacab len",len(vocab_words)
+            #need to replace this stupid hardcoded logic
             class_1 = {}
             class_2 = {}
             class_3 = {}
@@ -331,11 +332,7 @@ if __name__ == "__main__":
             cond_prob_class_20 = {}
             cond_prob_class_list = [cond_prob_class_1,cond_prob_class_2,cond_prob_class_3,cond_prob_class_4,cond_prob_class_5,cond_prob_class_6,cond_prob_class_7,cond_prob_class_8,cond_prob_class_9,cond_prob_class_10,
                           cond_prob_class_11,cond_prob_class_12,cond_prob_class_13,cond_prob_class_14,cond_prob_class_15,cond_prob_class_16,cond_prob_class_17,cond_prob_class_18,cond_prob_class_19,cond_prob_class_20]
-
             cal_conditional_term_in_vocab(vocab_words)
             pred_dict = predict_class(vocab_words,v)
             print pred_dict
             find_accuracy(pred_dict,v)
-
-
-
