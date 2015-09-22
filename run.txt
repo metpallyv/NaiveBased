@@ -1,5 +1,5 @@
 Steps to run this project:
 
-bernoulli_naive train.data train.label test.data test.label
-multinomial_naive train.data train.label test.data test.label
+bernoulli_naiveBased.py train.data train.label test.data test.label
+multinomial_naiveBased.py train.data train.label test.data test.label
 
