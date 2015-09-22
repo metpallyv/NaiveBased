@@ -1,5 +1,4 @@
 #Implementation of multinomial event naivebased classifier
-
 __author__ = 'Vardhaman'
 import sys
 import csv
@@ -17,7 +16,7 @@ word_dict = {}#dic with word and freq over the entire corpus
 test_doc_class = {}#dic with test doc id and its corresponding class value
 doc_dict = {}#construct test doc with docid as key and word n count as another dict
 
-
+#method to get a dictionary for each word and its frequency over the entire corpus
 def vocab_fre(train_file):
     f = open(train_file,'r')
     for line in f.readlines():
@@ -28,6 +27,7 @@ def vocab_fre(train_file):
             word_dict[words[1]] = int(words[2])
     print "dictionary",word_dict
 
+#method to cal prior probability for each class
 def cal_prior_prob_for_class(label_file):
     class_dict = {}
     f = open(label_file, 'r')
@@ -43,21 +43,21 @@ def cal_prior_prob_for_class(label_file):
     #print class_dict
     for key in class_dict.keys():
         prior_prob_dict[key.strip()] = math.log(class_dict[key.strip()]) - math.log(sum_val)
-        #prior_prob_dict[key.strip()] = float(class_dict[key.strip()])/sum_val
-    #print prior_prob_dict
-    #print doc_class
 
+#word and associated count for that word for each class
 def add_word_to_dict(class_dict,word,count):
     if class_dict.has_key(word):
         class_dict[word] = int(class_dict.get(word)) + int(count)
     else:
         class_dict[word] = int(count)
 
+#this logic is horrible right now, need to improve it soon
+#dicitonary with each class and corresponding count for words int that particular class
+#this is because we are doing multinomial event model
 def add_word_to_appropriate_class_dict(words):
     doc_class_val= int(doc_class[int(words[0])])
     #print(doc_class_val)
     if doc_class_val == 1:
-
         if class_1.has_key(words[1]):
             class_1[words[1]] = int(class_1.get(words[1])) + int(words[2])
         else:
@@ -158,6 +158,7 @@ def add_word_to_appropriate_class_dict(words):
         else:
             class_20[words[1]] = words[2]
 
+#dic with test doc id and its corresponding class value
 def build_test_class_dict(testlabel):
     f = open(test_label,'r')
     count = 1
@@ -167,18 +168,16 @@ def build_test_class_dict(testlabel):
         count +=1
     #print len(test_doc_class)
 
+#this is the method which calls the stupid implementation defined earlier
+#it generates multinomial distr for each word for every class
 def build_multinomial_distr(label_file,vocab):
     f = open(label_file,'r')
     for line in f.readlines():
         words = line.split()
         if words[1] in vocab:
             add_word_to_appropriate_class_dict(words)
-    '''print "len of class_1", len(class_1)
-    print "len of class_15", len(class_15)
-    print "len of class_5", len(class_5)
-    print "len of class_20", len(class_20)
-    print "len of class_10", len(class_10)'''
 
+#construct test doc with docid as key and word n count as another dict
 def build_doc_for_words(testfile):
     f = open(testfile,'r')
     for line in f.readlines():
@@ -194,22 +193,20 @@ def build_doc_for_words(testfile):
             else:
                 dict_of_words_count[words[1]] = int(words[2])
                 doc_dict[words[0]] = dict_of_words_count
-
-            '''l = doc_dict[words[0]]
-            l.append(dic)
-            doc_dict[words[0]] = l'''
         else:
             dict_of_words_count = {}
             dict_of_words_count[words[1]] = words[2]
             doc_dict[words[0]] = dict_of_words_count
     #print doc_dict
 
+#method to get the count of every word in a doc
 def return_count_term_in_doc(term,ele_in_doc):
     for i in ele_in_doc:
         if i.has_key(term):
             return int(i[term])
     return 0
 
+#predict the class for the test doc
 def predict_class(vocab_words,v):
     pred_dict = {}
     #print(len(doc_dict))
@@ -256,6 +253,7 @@ def predict_class(vocab_words,v):
             pred_class = cl
         return pred_class'''
 
+#acuuracy for the test data
 def find_accuracy(d,val):
     no_of_right = 0
     no_of_wrong = 0
@@ -265,16 +263,15 @@ def find_accuracy(d,val):
         #print "Value of pred is", d[k+1], "Value of test label is", test_doc_class[k+1]
         if int(d[k+1]) == int(test_doc_class[k+1]):
             no_of_right +=1
-
         else:
             no_of_wrong +=1
     #print "Sum of right and wrong is", no_of_wrong+no_of_right
     print "No of right values", no_of_right
     print "Accuracy for ",val, " ", "is", 100 * no_of_right/float(no_of_docs)
 
+#cal conditional probability for each term in the vocabulary
 def cal_conditional_term_in_vocab(vocab):
     for it,val in enumerate(class_list):
-
         lis = [int(i) for i in val.values()]
         len_c = sum(lis)
         cond_prob_class = {}
@@ -300,19 +297,16 @@ if __name__ == "__main__":
         build_doc_for_words(test_file)
         Freq = sorted(word_dict.iteritems(),key=itemgetter(1),reverse=True)
         l = [100, 500, 1000, 2500, 5000, 7500, 10000, 12500, 25000, 50000]
-        #Freq = sorted(word_dict, key=word_dict.get, reverse=True)
-
-        #print "Sorted dic",Freq
-        #print Freq1
         for v in l:
             p_list  = []
             vocab_words = []
             for i in range(v):
                 tmp = Freq[i]
                 vocab_words.append(tmp[0])
-            print(len(vocab_words))
+            #print(len(vocab_words))
             vocab_words = set(vocab_words)
-            print "new vacab len",len(vocab_words)
+            #print "new vacab len",len(vocab_words)
+            #stupid logic right now
             class_1 = {}
             class_2 = {}
             class_3 = {}
@@ -363,6 +357,3 @@ if __name__ == "__main__":
             pred_dict = predict_class(vocab_words,v)
             print pred_dict
             find_accuracy(pred_dict,v)
-
-
-
