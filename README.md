@@ -9,6 +9,8 @@ as (docId, wordId, count). The train.label and test.label files contain the labe
  
 https://archive.ics.uci.edu/ml/machine-learning-databases/20newsgroups-mld/20newsgroups.data.html
 
+Link to download the dataset: https://archive.ics.uci.edu/ml/datasets/Twenty+Newsgroups
+
 Here are the 20 classes from this data set:
 
 1. alt.atheism 1
